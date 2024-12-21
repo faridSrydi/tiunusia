@@ -20,7 +20,7 @@ app.use(express.json());
 
 // Configuring CORS to allow requests from frontend (port 5173 for Vite)
 app.use(cors({
-  origin: 'http://localhost:5173',  // Frontend running on Vite
+  origin: ['http://localhost:5173', 'http://139.59.98.18:5173'],  // Frontend running on Vite
   methods: ['GET', 'POST', 'DELETE'],  // Allowed methods
   allowedHeaders: ['Content-Type'],  // Allowed headers
 }));
@@ -210,6 +210,6 @@ app.delete('/api/team/:id', async (req, res) => {
 // Static file server for team member images
 app.use('/uploads/teams', express.static(uploadDirTeam));
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
 });

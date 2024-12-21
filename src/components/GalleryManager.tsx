@@ -13,7 +13,7 @@ const GalleryManager = () => {
   // Fetch gallery data
   const fetchGallery = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/gallery');
+      const response = await fetch('api/gallery');
       const data = await response.json();
       setGallery(data); // Set gallery data from response
     } catch (err) {
@@ -48,7 +48,7 @@ const GalleryManager = () => {
     formData.append('title', `Image ${gallery.length + 1}`); // Auto title with sequence number if no title provided
 
     try {
-      const response = await fetch('http://localhost:5000/api/uploadgallery', {
+      const response = await fetch('api/uploadgallery', {
         method: 'POST',
         body: formData,
       });
@@ -70,7 +70,7 @@ const GalleryManager = () => {
     if (!id) return;
 
     try {
-      await fetch(`http://localhost:5000/api/gallery/${id}`, {
+      await fetch(`api/gallery/${id}`, {
         method: 'DELETE',
       });
       setGallery((prev) => prev.filter((image) => image._id !== id)); // Remove deleted image from the gallery
@@ -104,7 +104,7 @@ const GalleryManager = () => {
           <input
             type="file"
             onChange={handleImageUpload}
-            className="p-2 bg-white-w-full mb-2 px-3 py-2 border rounded"
+            className="w-full mb-2 px-3 py-2 border rounded"
             multiple // Allow multiple files to be selected
           />
           <button
@@ -121,7 +121,7 @@ const GalleryManager = () => {
           {gallery.map((image) => (
             <div key={image._id} className="border rounded-lg p-1 relative">
               <img
-                src={`http://localhost:5000${image.url}`} // Assuming images are served from the server
+                src={`https://tiunusia.com/uploads${image.url}`} // Assuming images are served from the server
                 alt={image.title}
                 className="w-full h-29 object-cover rounded"
               />
