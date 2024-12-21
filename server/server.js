@@ -12,7 +12,8 @@ const port = 5000;
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://unusia:unusia@cluster0.oceot.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('Connected to MongoDB'))
+})
+  .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('Error connecting to MongoDB:', err));
 
 // Middleware
@@ -43,16 +44,18 @@ const teamMemberSchema = new mongoose.Schema({
 const TeamMember = mongoose.model('TeamMember', teamMemberSchema);
 
 // Ensure uploads directories exist
-const uploadDirGallery = 'uploads/gallery';
-const uploadDirTeam = 'uploads/teams';
+const uploadDirGallery = '/var/www/tiunusia/uploads/gallery';
+const uploadDirTeam = '/var/www/tiunusia/uploads/teams';
 
-if (!fs.existsSync(uploadDirGallery)) {
-  fs.mkdirSync(uploadDirGallery);
-}
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });  // Create directories recursively
+  }
+};
 
-if (!fs.existsSync(uploadDirTeam)) {
-  fs.mkdirSync(uploadDirTeam);
-}
+// Ensure both directories exist
+ensureDirectoryExists(uploadDirGallery);
+ensureDirectoryExists(uploadDirTeam);
 
 // Multer setup for gallery image uploads (validate file type)
 const storageGallery = multer.diskStorage({
@@ -139,9 +142,9 @@ app.delete('/api/gallery/:id', async (req, res) => {
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }
-    
+
     // Delete the image file from the server asynchronously
-    const imagePath = path.join(__dirname, 'uploads/gallery', image.url.split('/uploads/gallery')[1]);
+    const imagePath = path.join(uploadDirGallery, image.url.split('/uploads/gallery')[1]);
     await fs.promises.unlink(imagePath);  // Use asynchronous unlink
 
     res.json({ message: 'Image deleted' });
@@ -151,7 +154,7 @@ app.delete('/api/gallery/:id', async (req, res) => {
 });
 
 // Static file server for gallery images
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('/var/www/tiunusia/uploads'));
 
 // Routes for Team Members
 
@@ -193,7 +196,7 @@ app.delete('/api/team/:id', async (req, res) => {
     }
 
     // Delete the image file from the server asynchronously
-    const imagePath = path.join(__dirname, 'uploads/teams', teamMember.image.split('/uploads/teams')[1]);
+    const imagePath = path.join(uploadDirTeam, teamMember.image.split('/uploads/teams')[1]);
     await fs.promises.unlink(imagePath);  // Use asynchronous unlink
 
     res.json({ message: 'Team member deleted' });
@@ -203,7 +206,7 @@ app.delete('/api/team/:id', async (req, res) => {
 });
 
 // Static file server for team member images
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('/var/www/tiunusia/uploads'));
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
