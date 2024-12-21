@@ -119,14 +119,14 @@ app.post('/api/uploadgallery', uploadGallery.array('images', 10), async (req, re
 
     const uploadedImages = req.files.map((file) => {
       const newImage = new Image({
-        url: `/uploads/gallery/${file.filename}`, 
-        title: req.body.title || `Uploaded Image ${Date.now()}`, 
+        url: `https://tiunusia.com/uploads/gallery/${file.filename}`, // Full URL to the uploaded image
+        title: req.body.title || `Uploaded Image ${Date.now()}`,
       });
       return newImage.save();
     });
 
     const savedImages = await Promise.all(uploadedImages);
-    res.json(savedImages);  
+    res.json(savedImages);
   } catch (err) {
     res.status(500).json({ message: 'Error uploading images' });
   }
@@ -139,9 +139,11 @@ app.delete('/api/gallery/:id', async (req, res) => {
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }
-    // Optionally delete the image file from the server as well
+    
+    // Delete the image file from the server asynchronously
     const imagePath = path.join(__dirname, 'uploads/gallery', image.url.split('/uploads/gallery')[1]);
-    fs.unlinkSync(imagePath);  // Delete file from the filesystem
+    await fs.promises.unlink(imagePath);  // Use asynchronous unlink
+
     res.json({ message: 'Image deleted' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting image' });
@@ -149,7 +151,7 @@ app.delete('/api/gallery/:id', async (req, res) => {
 });
 
 // Static file server for gallery images
-app.use('/uploads/gallery', express.static(uploadDirGallery));
+app.use('/uploads', express.static('uploads'));
 
 // Routes for Team Members
 
@@ -167,7 +169,7 @@ app.get('/api/team', async (req, res) => {
 app.post('/api/uploadteam', uploadTeam.single('image'), async (req, res) => {
   try {
     const { name, role } = req.body;
-    const image = req.file ? `/uploads/teams/${req.file.filename}` : null; // Image URL after upload
+    const image = req.file ? `https://tiunusia.com/uploads/teams/${req.file.filename}` : null; // Full URL after upload
 
     if (!name || !role || !image) {
       return res.status(400).json({ message: 'Name, role, and image are required.' });
@@ -182,9 +184,6 @@ app.post('/api/uploadteam', uploadTeam.single('image'), async (req, res) => {
   }
 });
 
-// Delete a team member
-
-// Corrected route for deleting a team member and its image
 // Delete a team member and their image
 app.delete('/api/team/:id', async (req, res) => {
   try {
@@ -192,10 +191,10 @@ app.delete('/api/team/:id', async (req, res) => {
     if (!teamMember) {
       return res.status(404).json({ message: 'Team member not found' });
     }
-    
-    // Delete the image file from the server
+
+    // Delete the image file from the server asynchronously
     const imagePath = path.join(__dirname, 'uploads/teams', teamMember.image.split('/uploads/teams')[1]);
-    fs.unlinkSync(imagePath);  // Delete file from the filesystem
+    await fs.promises.unlink(imagePath);  // Use asynchronous unlink
 
     res.json({ message: 'Team member deleted' });
   } catch (err) {
@@ -203,12 +202,8 @@ app.delete('/api/team/:id', async (req, res) => {
   }
 });
 
-
-
-
-
 // Static file server for team member images
-app.use('/uploads/teams', express.static(uploadDirTeam));
+app.use('/uploads', express.static('uploads'));
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${port}`);
