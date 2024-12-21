@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom'; // Import useLocation
+import { Link, useLocation } from 'react-router-dom';
 import { DownloadIcon } from '@heroicons/react/outline';
 
 const Gallery = ({ preview = false }: { preview?: boolean }) => {
@@ -64,7 +64,7 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
   // Fungsi untuk mengunduh gambar
   const handleDownload = (imageUrl: string) => {
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${imageUrl}`;
+    link.href = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${imageUrl}`; // Support for environment-based URLs
     link.download = imageUrl.split('/').pop() || 'image.jpg'; // Mengambil nama gambar dari URL dan memberikan nama default
     link.click();
   };
@@ -99,7 +99,6 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
   }
 
   return (
-    
     <div className="py-16 bg-gray-100">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
@@ -113,15 +112,14 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
             ease: 'easeInOut',
           }}
         >
-        🎨Gallery 
+          🎨 Gallery
         </motion.h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayImages.map((image, index) => {
             const imageType = getImageType(image);
 
-            // Use different column spans based on image type (landscape vs portrait)
             const gridClasses =
-              imageType === 'landscape' ? 'lg:col-span-2' : ''; // For landscape images, span 2 columns
+              imageType === 'landscape' ? 'lg:col-span-2' : '';
 
             return (
               <motion.div
@@ -132,16 +130,15 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
                 className={`relative group overflow-hidden rounded-lg shadow-lg ${gridClasses}`}
               >
                 <img
-                  src={`http://localhost:5000${image.url}`} // Menampilkan URL gambar dari database
+                  src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${image.url}`} // Handle environment-based URLs
                   alt={`Gallery ${index + 1}`}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300 cursor-pointer"
                 />
-                {/* Tombol Unduh di pojok kanan bawah tanpa efek gelap */}
                 <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <motion.button
                     onClick={(e) => {
-                      e.stopPropagation(); // Mencegah pemanggilan handleDownload saat gambar diklik
-                      confirmDownload(image.url); // Memanggil fungsi konfirmasi download saat tombol diklik
+                      e.stopPropagation();
+                      confirmDownload(image.url); // Trigger download confirmation
                     }}
                     className="p-3 bg-indigo-600 text-white rounded-full transition cursor-pointer"
                     initial={{ scale: 0 }}
@@ -156,23 +153,22 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
           })}
         </div>
 
-        {/* Tombol Pagination - hanya tampil jika ada lebih dari 9 gambar dan hanya di halaman gallery */}
         {totalImages > 9 && location.pathname === '/gallery' && (
           <div className="text-center mt-14">
             <button
               onClick={prevPage}
               className="inline-block px-6 py-3 bg-indigo-600 font-bold text-white rounded-lg hover:bg-indigo-700 transition mr-4"
-              disabled={currentPage === 1} // Disable tombol Prev jika di halaman pertama
+              disabled={currentPage === 1}
             >
               Prev
             </button>
             <span className="text-lg font-semibold">
-            {currentPage} of {totalPages}
+              {currentPage} of {totalPages}
             </span>
             <button
               onClick={nextPage}
               className="inline-block px-6 py-3 bg-indigo-600 font-bold text-white rounded-lg hover:bg-indigo-700 transition ml-4"
-              disabled={currentPage === totalPages} // Disable tombol Next jika di halaman terakhir
+              disabled={currentPage === totalPages}
             >
               Next
             </button>
@@ -191,7 +187,6 @@ const Gallery = ({ preview = false }: { preview?: boolean }) => {
         )}
       </div>
 
-      {/* Alert Konfirmasi Download */}
       {showAlert && (
         <motion.div
           initial={{ opacity: 0, y: -50 }}
