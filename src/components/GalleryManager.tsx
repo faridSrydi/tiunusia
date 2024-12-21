@@ -13,7 +13,7 @@ const GalleryManager = () => {
   // Fetch gallery data
   const fetchGallery = async () => {
     try {
-      const response = await fetch('https://tiunusia.com/api/gallery');
+      const response = await fetch('api/gallery');
       const data = await response.json();
       setGallery(data); // Set gallery data from response
     } catch (err) {
@@ -48,7 +48,7 @@ const GalleryManager = () => {
     formData.append('title', `Image ${gallery.length + 1}`); // Auto title with sequence number if no title provided
 
     try {
-      const response = await fetch('https://tiunusia.com/api/uploadgallery', {
+      const response = await fetch('api/uploadgallery', {
         method: 'POST',
         body: formData,
       });
@@ -70,7 +70,7 @@ const GalleryManager = () => {
     if (!id) return;
 
     try {
-      await fetch(`https://tiunusia.com/api/gallery/${id}`, {
+      await fetch(`api/gallery/${id}`, {
         method: 'DELETE',
       });
       setGallery((prev) => prev.filter((image) => image._id !== id)); // Remove deleted image from the gallery
