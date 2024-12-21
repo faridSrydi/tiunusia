@@ -121,7 +121,7 @@ const GalleryManager = () => {
           {gallery.map((image) => (
             <div key={image._id} className="border rounded-lg p-1 relative">
               <img
-                src={`https://tiunusia.com/uploads${image.url}`} // Assuming images are served from the server
+                src={`https://tiunusia.com/uploads/gallery/${image.url.split('/gallery')[1]}`} // Adjust image path
                 alt={image.title}
                 className="w-full h-29 object-cover rounded"
               />
