@@ -69,6 +69,7 @@ const storageGallery = multer.diskStorage({
 
 const uploadGallery = multer({
   storage: storageGallery,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];  // Allow only images
     if (allowedTypes.includes(file.mimetype)) {
@@ -78,6 +79,8 @@ const uploadGallery = multer({
     }
   },
 });
+
+
 
 // Multer setup for team member image uploads (validate file type)
 const storageTeam = multer.diskStorage({
@@ -89,8 +92,10 @@ const storageTeam = multer.diskStorage({
   },
 });
 
+
 const uploadTeam = multer({
   storage: storageTeam,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];  // Allow only images
     if (allowedTypes.includes(file.mimetype)) {
